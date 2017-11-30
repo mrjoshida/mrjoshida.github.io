@@ -1,0 +1,51 @@
+{
+  "name": "@code-dot-org/p5.play",
+  "version": "1.1.9-cdo",
+  "description": "Code.org fork of molleindustria/p5.play for use within the Code Studio learning environment.",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^3.1.0",
+    "http-server": "^0.9.0",
+    "mocha-phantomjs": "^4.0.1",
+    "yuidocjs": "^0.10.0"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "files": [
+    "lib/p5.play.js",
+    "examples/lib/p5.js"
+  ],
+  "scripts": {
+    "docs": "yuidoc .",
+    "lint": "eslint lib/** test/unit/** examples/*.js",
+    "lint:examples": "eslint examples/*.js",
+    "lint:lib": "eslint lib/**",
+    "lint:test": "eslint test/unit/**",
+    "start": "http-server -o",
+    "pretest": "npm run lint",
+    "test": "mocha-phantomjs test/index.html",
+    "preversion": "npm whoami && npm test",
+    "version": "node ensure-cdo-version.js",
+    "postversion": "git push && git push --tags && npm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/code-dot-org/p5.play.git"
+  },
+  "author": "Paolo Pedercini <info@molleindustria.it>",
+  "contributors": [
+    "Atul Varma <varmaa@gmail.com>",
+    "Brad Buchanan <brad@code.org>",
+    "Caley Brock <caley@code.org>",
+    "Chris Pirich <chris@code.org>",
+    "Dan Bernier <danbernier@gmail.com>",
+    "Henry Lake",
+    "Jared Sprague",
+    "Josh Lory <josh.lory@code.org>",
+    "Leaps <lmtejedor@gmail.com>",
+    "Michael Clayton <mwc@clayto.com>"
+  ],
+  "license": "LGPL-2.1",
+  "homepage": "https://github.com/code-dot-org/p5.play#readme"
+}
