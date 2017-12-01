@@ -61,16 +61,18 @@ function draw() {
   //same as keyWentDown
   //RIGHT = right mouse button
   if(keyDown("left"))
-    asterisk.position.x--;
+    asterisk.position.x-=5;
 
   if(keyDown("right"))
-    asterisk.position.x++;
+    asterisk.position.x+=5;
 
   if(keyDown("up"))
-    asterisk.position.y--;
+    asterisk.position.y-=5;
 
   if(keyDown("down"))
-    asterisk.position.y++;
+    asterisk.position.y+=5;
+
+  drawSprites();
 
   for (var i=0; i<allSprites.length; i++) {
       var sprite = allSprites[i];
@@ -78,8 +80,5 @@ function draw() {
           fill("black");
           text(sprite.saying, sprite.position.x + sprite.width / 2, sprite.position.y - sprite.height / 2);
       }
-
   }
-
-  drawSprites();
 }
