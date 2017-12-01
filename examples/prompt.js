@@ -1,9 +1,13 @@
 //Moving sprites
-var ghost, circle;
+var ghost, circle, canvas;
 var direction = 90; //circle initial direction moving down
 
 function setup() {
   createCanvas(800, 400);
+
+  input = createInput();
+  button = createButton('submit');
+  button.mousePressed(greet);
 
   //create the sprites
   ghost = createSprite(600, 200, 50, 100);
@@ -11,19 +15,21 @@ function setup() {
 
   circle = createSprite(400, 200, 50, 100);
   circle.addAnimation('floating', 'assets/asterisk_circle0006.png', 'assets/asterisk_circle0008.png');
-
-
+  circle.saying = "What's your name?";
 
 }
 
 function draw() {
   background(255, 255, 255);
 
+
   //aside of setting the velocity directly you can move a sprite
   //by providing a speed and an angle
   direction += 2;
   //speed, angle
   circle.setSpeed(3, direction);
+  fill("black");
+  text(circle.saying, circle.position.x + circle.width/2, circle.position.y - circle.height/2);
 
   //you can rotate the sprite according the direction it is moving
   //uncomment this
@@ -38,4 +44,10 @@ function draw() {
 
   //draw the sprite
   drawSprites();
+}
+
+function greet() {
+  var name = input.value();
+  circle.saying = "Hello " + name;
+  input.value("");
 }
