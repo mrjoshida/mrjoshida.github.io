@@ -38,6 +38,12 @@
 
       <li role="presentation"><a role="menuitem" tabindex="-1" href="index.html?fileName=sound-sequence.js">Sound - sequence</a></li>
 
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="index.html?fileName=sound-visualizer.js">Sound - visualizer</a></li>
+
+      <li role="presentation"><a role="menuitem" tabindex="-1" href="index.html?fileName=sound-visualizer-simple.js">Sound - visualizer simple</a></li>
+
+      <li role="presentation" class="divider"></li>
+
       <li role="presentation"><a role="menuitem" tabindex="-1" href="index.html?fileName=prompt.js">p5.dom input test</a></li>
 
       <li role="presentation"><a role="menuitem" tabindex="-1" href="index.html?fileName=madlib.js">Mad Lib</a></li>
@@ -122,7 +128,7 @@
         fileName = getUrlValue("fileName");
 
         if(fileName==undefined)
-          fileName = "prompt.js";
+          fileName = "sound-part.js";
 
         $.ajax({
           type: "GET",
