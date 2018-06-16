@@ -8,14 +8,15 @@ var src_length; // hold sound file duration
 var peaks;
 var detectors = []; // array of beat detectors
 var bg_color = "white";
+var bass_attraction = {x: 200, y: 200};
+
 
 function preload() {
-	audio = loadSound("assets/tracks/04 Way to Blue.m4a");
+	audio = loadSound("assets/tracks/L.O.R.D.mp3");
 }
 
 
 function setup() {
-
 	createCanvas(800, 400);
 
 	src_length = audio.duration();
@@ -44,7 +45,8 @@ function setup() {
     colorMode(HSB, 255);
 
 	bassSprite = createSprite(200, 200);
-	bassSprite.addAnimation('normal', 'assets/ghost_spin0001.png', 'assets/ghost_spin0003.png');
+	bassSprite.addAnimation('normal', 'assets/ghost_standing0001.png', 'assets/ghost_standing0002.png', 'assets/ghost_standing0004.png', 'assets/ghost_standing0004.png', 'assets/ghost_standing0005.png', 'assets/ghost_standing0006.png', 'assets/ghost_standing0007.png');
+	bassSprite.maxSpeed = 1;
 
 	midSprite = createSprite(400, 200);
 	midSprite.addAnimation('normal', 'assets/asterisk_normal0001.png', 'assets/asterisk_normal0003.png');
@@ -104,6 +106,8 @@ function draw() {
 	midSprite.rotation = rotationMid;
 	trebleSprite.position.y = posTreble;
 
+    bassSprite.attractionPoint(1, bass_attraction.x, bass_attraction.y);
+
 	drawSprites();
 }
 
@@ -129,8 +133,8 @@ function toggleAudio() {
 function gotPeak(value, index) {
 
   if (index == 0) {
-      bassSprite.position.x = random(50, 350);
-      bassSprite.position.y = random(50, 350);
+      bass_attraction.x = random(200, 400);
+      bass_attraction.y = random(100, 300);
   } else if (index == 1) {
       midSprite.changeAnimation(midSprite.animationLabels[frameCount % midSprite.animationLabels.length])
   } else if (index == 2) {
