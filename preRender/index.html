@@ -1,0 +1,229 @@
+<head>
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script language="javascript" type="text/javascript" src="../lib/p5.min.js"></script>
+
+    <script language="javascript" type="text/javascript" src="../lib/addons/p5.dom.js"></script>
+
+    <script language="javascript" type="text/javascript" src="../lib/p5.sound.js"></script>
+
+    <style>
+        label {
+            text-align: right;
+            width: 125px;
+            float: left;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        form p {
+            clear: both;
+            padding: 5px;
+        }
+    </style>
+
+
+</head>
+
+<body>
+<div id="song_select">
+    <form action="javascript:initialize()">
+        <p><label for="url">Song URL</label><input name="url" type="url" id="songUrl" style="width: 300px"
+                                                   value="https://curriculum.code.org/media/uploads/feeling.mp3">
+        <p><label for="bpm">Song BPM</label><input name="bpm" type="number" id="songBpm" value="133">
+        <p><label for="bass">Bass Threshold</label><input name="bass" type="range" min="1" max="100" value="80"
+                                                          class="slider" id="bassThresh">
+        <p><label for="mid">Mid Threshold</label><input name="mid" type="range" min="1" max="100" value="50"
+                                                        class="slider" id="midThresh">
+        <p><label for="treble">Treble Threshold</label><input name="treble" type="range" min="1" max="100" value="25"
+                                                              class="slider" id="trebleThresh">
+        <p><input type="submit" value="Load Song">
+    </form>
+</div>
+<div id="sketch_container" style="position: relative;"></div>
+
+<script>
+    function initialize() {
+        $('#sketch_container')[0].innerHTML = "";
+        if (window.analyzer) analyzer.remove();
+        console.log("initializing")
+        var sketch = function (p) {
+            var file = $('#songUrl').val();
+            var bpm = $('#songBpm').val();
+            var bass_threshold = $('#bassThresh').val() / 100;
+            var mid_threshold = $('#midThresh').val() / 100;
+            var treble_threshold = $('#trebleThresh').val() / 100;
+
+            var file_input, delay;
+            var play_button, pause_button, save_button;
+
+            var bass, mid, treble, amplitude;
+
+            var pg;
+
+            var source_file; // sound file
+            var src_length; // hold its duration
+
+            var fft;
+
+            var beats = [];
+
+            var analysis = [];
+
+            // detectors listen for peaks
+
+
+            p.preload = function () {
+                source_file = p.loadSound(file); // preload the sound
+            }
+
+            p.setup = function () {
+                p.frameRate(24);
+                p.createCanvas(400, 400);
+                p.noStroke();
+
+
+                src_length = source_file.duration();
+                console.log(src_length);
+                //println("source duration: " +src_length);
+
+                // draw the waveform to an off-screen graphic
+                var peaks = source_file.getPeaks(p.width); // get an array of peaks
+                pg = p.createGraphics(p.width, 100);
+                //pg.background(200);
+                pg.translate(0, 50);
+                pg.noFill();
+                pg.stroke("#7665a0");
+                for (var i = 0; i < peaks.length; i++) {
+                    var x = p.map(i, 0, peaks.length, 0, p.width);
+                    console.log(x);
+                    var y = p.map(peaks[i], 0, 1, 0, 100);
+                    pg.line(x, 0, x, y);
+                    pg.line(x, 0, x, -y);
+                }
+                pg.translate(0, -50);
+                pg.blendMode(p.SCREEN)
+
+
+
+                // FFT
+                fft = new p5.FFT();
+
+                var delay = 24 / (bpm / 60);
+
+                bass = new p5.PeakDetect(10, 300, bass_threshold, 5);
+
+                mid = new p5.PeakDetect(300, 2400, mid_threshold, 5);
+
+                treble = new p5.PeakDetect(2400, 20000, treble_threshold, 5);
+
+                amplitude = new p5.Amplitude(0.5);
+
+                play_button = p.createButton("play");
+                play_button.position(20, 20);
+                play_button.mousePressed(startAnalysis);
+
+                pause_button = p.createButton("pause");
+                pause_button.position(20, 20);
+                pause_button.hide();
+                pause_button.mousePressed(pauseAnalysis);
+
+                save_button = p.createButton("save JSON");
+                save_button.position(20, 50);
+                save_button.id("save_button");
+                save_button.hide();
+                save_button.mousePressed(downloadJSON);
+            }
+
+            p.draw = function () {
+                p.background("white");
+
+                pg.noStroke();
+                pg.fill(255, 255, 255, 16);
+                pg.rect(p.map(source_file.currentTime(),0,src_length,0,p.width / 2),0,2,100);
+
+                if (!source_file.isPlaying) return;
+
+                fft.analyze();
+                bass.update(fft);
+                mid.update(fft);
+                treble.update(fft);
+
+                var frame = {
+                    time: source_file.currentTime(),
+                    beats: [bass.isDetected, mid.isDetected, treble.isDetected],
+                    energy: [fft.getEnergy("bass"), fft.getEnergy("mid"), fft.getEnergy("treble")],
+                    volume: amplitude.getLevel()
+                };
+
+                p.text(frame.time, 200, 50, 400, 100);
+
+                p.fill("#00adbc");
+                for (var i = 0; i < 3; i++) {
+                    if (frame.beats[i]) {
+                        beats[i] = 100;
+                    }
+                    p.ellipse(100 + (i * 100), 150, beats[i], beats[i]);
+                    p.rect(75 + (i * 100), 400 - frame.energy[i], 50, frame.energy[i]);
+                    beats[i] *= 0.9;
+                }
+                p.image(pg, 0, 300); // display our waveform representation
+
+
+                analysis.push(frame);
+
+                if (source_file.currentTime() >= src_length - 0.05) {
+                    p.text("Done", 100, 100, 100, 100);
+                    p.noLoop();
+                }
+
+            }
+
+            function startAnalysis() {
+                save_button.show();
+                source_file.play();
+                play_button.hide();
+                pause_button.show();
+            }
+
+            function pauseAnalysis() {
+                source_file.pause();
+                play_button.show();
+                pause_button.hide();
+            }
+
+            function downloadJSON() {
+
+                var data = encode(JSON.stringify(
+                    analysis
+                    , null, 4));
+
+                var blob = new Blob([data], {
+                    type: 'application/octet-stream'
+                });
+
+                url = URL.createObjectURL(blob);
+                var link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'song.json');
+
+                var event = document.createEvent('MouseEvents');
+                event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+                link.dispatchEvent(event);
+
+            }
+
+            function encode(s) {
+                var out = [];
+                for (var i = 0; i < s.length; i++) {
+                    out[i] = s.charCodeAt(i);
+                }
+                return new Uint8Array(out);
+            }
+        };
+        window.analyzer = new p5(sketch, 'sketch_container');
+    }
+</script>
+</body>

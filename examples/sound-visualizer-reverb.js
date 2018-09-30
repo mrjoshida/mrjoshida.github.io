@@ -5,14 +5,15 @@
 
 var pieces, radius, fft, mapMouseX, mapMouseY, toggleBtn, audio, uploadBtn, uploadedAudio, uploadAnim;
 var src_length; // hold sound file duration
-var peaks, processed_peaks;
+var peaks;
 var detectors = []; // array of beat detectors
 var bg_color = "white";
 var bass_attraction = {x: 200, y: 200};
 
 
 function preload() {
-	audio = loadSound("https://s3.amazonaws.com/cdo-curriculum/media/uploads/chu.mp3");
+	audio = loadSound("assets/tracks/L.O.R.D.mp3");
+	audio.disconnect();
 }
 
 
@@ -23,11 +24,8 @@ function setup() {
 
 	peaks = audio.getPeaks();
 
-	audio.processPeaks(function(new_peaks) {
-        console.log(new_peaks);
-        processed_peaks = peaks;
-      });
-
+	reverb = new p5.Reverb();
+	reverb.process
 	fft = new p5.FFT();
     detectors.push( new p5.PeakDetect(40, 120, 0.8, 20) );
 
