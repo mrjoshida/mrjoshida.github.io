@@ -30,21 +30,45 @@
 <body>
 <div id="song_select">
     <form action="javascript:initialize()">
-        <p><label for="url">Song URL</label><input name="url" type="url" id="songUrl" style="width: 300px"
-                                                   value="https://curriculum.code.org/media/uploads/feeling.mp3">
-        <p><label for="bpm">Song BPM</label><input name="bpm" type="number" id="songBpm" value="133">
-        <p><label for="bass">Bass Threshold</label><input name="bass" type="range" min="1" max="100" value="80"
-                                                          class="slider" id="bassThresh">
-        <p><label for="mid">Mid Threshold</label><input name="mid" type="range" min="1" max="100" value="50"
-                                                        class="slider" id="midThresh">
-        <p><label for="treble">Treble Threshold</label><input name="treble" type="range" min="1" max="100" value="25"
-                                                              class="slider" id="trebleThresh">
-        <p><input type="submit" value="Load Song">
+        <p>
+            <label for="url">Song URL</label>
+            <input name="url" type="url" id="songUrl" style="width: 300px"
+                   value="https://curriculum.code.org/media/uploads/feeling.mp3">
+        </p>
+        <p>
+            <label for="bpm">Song BPM</label>
+            <input name="bpm" type="number" id="songBpm" value="133">
+        </p>
+        <p>
+            <label for="bass">Bass Threshold</label>
+            <input name="bass" type="range" min="1" max="100" value="80"
+                   class="slider" id="bassThresh" onchange="showValue('#bass_val', this.value / 100);">
+            <span id="bass_val">0.8</span>
+        </p>
+        <p>
+            <label for="mid">Mid Threshold</label>
+            <input name="mid" type="range" min="1" max="100" value="50"
+                   class="slider" id="midThresh" onchange="showValue('#mid_val', this.value / 100);">
+            <span id="mid_val">0.5</span>
+        </p>
+        <p>
+            <label for="treble">Treble Threshold</label>
+            <input name="treble" type="range" min="1" max="100" value="25"
+                   class="slider" id="trebleThresh" onchange="showValue('#treble_val', this.value / 100);">
+            <span id="treble_val">0.25</span>
+        </p>
+        <p>
+            <input type="submit" value="Load Song">
+        </p>
     </form>
 </div>
 <div id="sketch_container" style="position: relative;"></div>
 
 <script>
+    function showValue(target, val) {
+        $(target).text(val);
+    }
+
     function initialize() {
         $('#sketch_container')[0].innerHTML = "";
         if (window.analyzer) analyzer.remove();
@@ -86,7 +110,6 @@
 
 
                 src_length = source_file.duration();
-                console.log(src_length);
                 //println("source duration: " +src_length);
 
                 // draw the waveform to an off-screen graphic
@@ -98,14 +121,12 @@
                 pg.stroke("#7665a0");
                 for (var i = 0; i < peaks.length; i++) {
                     var x = p.map(i, 0, peaks.length, 0, p.width);
-                    console.log(x);
                     var y = p.map(peaks[i], 0, 1, 0, 100);
                     pg.line(x, 0, x, y);
                     pg.line(x, 0, x, -y);
                 }
                 pg.translate(0, -50);
                 pg.blendMode(p.SCREEN)
-
 
 
                 // FFT
@@ -142,7 +163,7 @@
 
                 pg.noStroke();
                 pg.fill(255, 255, 255, 16);
-                pg.rect(p.map(source_file.currentTime(),0,src_length,0,p.width / 2),0,2,100);
+                pg.rect(p.map(source_file.currentTime(), 0, src_length, 0, p.width / 2), 0, 2, 100);
 
                 if (!source_file.isPlaying) return;
 
