@@ -40,6 +40,10 @@
             <input name="bpm" type="number" id="songBpm" value="133">
         </p>
         <p>
+            <label for="delay">Delay</label>
+            <input name="delay" type="number" id="songDelay" value="0.0" step="0.000001">
+        </p>
+        <p>
             <label for="bass">Bass Threshold</label>
             <input name="bass" type="range" min="1" max="100" value="80"
                    class="slider" id="bassThresh" onchange="showValue('#bass_val', this.value / 100);">
@@ -74,8 +78,12 @@
         if (window.analyzer) analyzer.remove();
         console.log("initializing")
         var sketch = function (p) {
-            var file = $('#songUrl').val();
-            var bpm = $('#songBpm').val();
+            var meta = {
+                file: $('#songUrl').val(),
+                bpm: $('#songBpm').val(),
+                delay: $('#songDelay').val(),
+                analysis: []
+            }
             var bass_threshold = $('#bassThresh').val() / 100;
             var mid_threshold = $('#midThresh').val() / 100;
             var treble_threshold = $('#trebleThresh').val() / 100;
@@ -94,13 +102,11 @@
 
             var beats = [];
 
-            var analysis = [];
-
             // detectors listen for peaks
 
 
             p.preload = function () {
-                source_file = p.loadSound(file); // preload the sound
+                source_file = p.loadSound(meta.file); // preload the sound
             }
 
             p.setup = function () {
@@ -109,19 +115,18 @@
                 p.noStroke();
 
 
-                src_length = source_file.duration();
-                //println("source duration: " +src_length);
+                meta.duration = source_file.duration();
 
                 // draw the waveform to an off-screen graphic
-                var peaks = source_file.getPeaks(p.width); // get an array of peaks
+                meta.peaks = source_file.getPeaks(p.width); // get an array of peaks
                 pg = p.createGraphics(p.width, 100);
                 //pg.background(200);
                 pg.translate(0, 50);
                 pg.noFill();
                 pg.stroke("#7665a0");
-                for (var i = 0; i < peaks.length; i++) {
-                    var x = p.map(i, 0, peaks.length, 0, p.width);
-                    var y = p.map(peaks[i], 0, 1, 0, 100);
+                for (var i = 0; i < meta.peaks.length; i++) {
+                    var x = p.map(i, 0, meta.peaks.length, 0, p.width);
+                    var y = p.map(meta.peaks[i], 0, 1, 0, 100);
                     pg.line(x, 0, x, y);
                     pg.line(x, 0, x, -y);
                 }
@@ -132,7 +137,7 @@
                 // FFT
                 fft = new p5.FFT();
 
-                var delay = 24 / (bpm / 60);
+                delay = 24 / (meta.bpm / 60);
 
                 bass = new p5.PeakDetect(10, 300, bass_threshold, 5);
 
@@ -163,7 +168,7 @@
 
                 pg.noStroke();
                 pg.fill(255, 255, 255, 16);
-                pg.rect(p.map(source_file.currentTime(), 0, src_length, 0, p.width / 2), 0, 2, 100);
+                pg.rect(p.map(source_file.currentTime(), 0, meta.duration, 0, p.width / 2), 0, 2, 100);
 
                 if (!source_file.isPlaying) return;
 
@@ -176,7 +181,8 @@
                     time: source_file.currentTime(),
                     beats: [bass.isDetected, mid.isDetected, treble.isDetected],
                     energy: [fft.getEnergy("bass"), fft.getEnergy("mid"), fft.getEnergy("treble")],
-                    volume: amplitude.getLevel()
+                    volume: amplitude.getLevel(),
+                    centroid: fft.getCentroid()
                 };
 
                 p.text(frame.time, 200, 50, 400, 100);
@@ -193,9 +199,9 @@
                 p.image(pg, 0, 300); // display our waveform representation
 
 
-                analysis.push(frame);
+                meta.analysis.push(frame);
 
-                if (source_file.currentTime() >= src_length - 0.05) {
+                if (source_file.currentTime() >= meta.duration - 0.05) {
                     p.text("Done", 100, 100, 100, 100);
                     p.noLoop();
                 }
@@ -218,8 +224,9 @@
             function downloadJSON() {
 
                 var data = encode(JSON.stringify(
-                    analysis
+                    meta
                     , null, 4));
+                var filename = meta.file.substring(meta.file.lastIndexOf('/')+1) + '.json';
 
                 var blob = new Blob([data], {
                     type: 'application/octet-stream'
@@ -228,7 +235,7 @@
                 url = URL.createObjectURL(blob);
                 var link = document.createElement('a');
                 link.setAttribute('href', url);
-                link.setAttribute('download', 'song.json');
+                link.setAttribute('download', filename);
 
                 var event = document.createEvent('MouseEvents');
                 event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
