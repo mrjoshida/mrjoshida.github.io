@@ -1,24 +1,25 @@
-// Pure SVG animations
-// Currently p5play animations don't allow for svg
-// so drawing them manually
+// SVGs as sprite animations
+// requires edits to p5.play
 
-var images = [];
+var bear, dance;
 
 function preload() {
-    for (var i=0; i<24; i++) {
-        // images.push(loadImage('assets/svg/bear' + i + '.svg')); // Direct export from bodymovin
-        images.push(loadImage('assets/svgo/bear' + i + '.svg')); // Optimized with SVGO
-    }
-    console.log(images)
+    dance = loadAnimation('assets/svgo/bear0.svg', 'assets/svgo/bear23.svg');
+    dance.frameDelay = 1;
 }
 
 function setup() {
-  createCanvas(400, 400);
-  frameRate(24);
+    createCanvas(400, 400);
+    frameRate(24);
+
+    for (var i=0; i<64; i++) {
+        bear = createSprite(25 + ((i % 8) * 50), 25 + (Math.floor(i / 8) * 50));
+        bear.addAnimation('dance', dance);
+        bear.scale = 0.2;
+    }
 }
 
 function draw() {
-  background(255, 255, 255);
-  for (var i = 63; i>=0; i--)
-  image(images[frameCount % 24], (i % 8) * 50, Math.floor(i / 8) * 50, mouseX, mouseX);
+    background(255, 255, 255);
+    drawSprites();
 }
