@@ -93,7 +93,7 @@
             var meta = {}
             if ($('#songFile')[0].files[0]) {
                 source = $('#songFile')[0].files[0];
-                meta.file = source.name;
+                meta.file = "/restricted/" + source.name;
             } else {
                 source = $('#songUrl').val();
                 meta.file = source;
