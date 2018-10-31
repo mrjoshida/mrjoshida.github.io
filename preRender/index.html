@@ -30,10 +30,23 @@
 <body>
 <div id="song_select">
     <form action="javascript:initialize()">
+
         <p>
-            <label for="url">Song URL</label>
+            <label for="file">Upload file</label>
+            <input type="file" id="songFile" name="file" accept=".mp3"
+                   onchange="(function() { $('#songUrl').val('') })()"/>
+        <p>
+            <label for="url">or song URL</label>
             <input name="url" type="url" id="songUrl" style="width: 300px"
                    value="https://curriculum.code.org/media/uploads/feeling.mp3">
+        </p>
+        <p>
+            <label for="artist">Artist</label>
+            <input name="artist" id="songArtist" style="width: 300px">
+        </p>
+        <p>
+            <label for="title">Title</label>
+            <input name="title" id="songTitle" style="width: 300px">
         </p>
         <p>
             <label for="bpm">Song BPM</label>
@@ -69,21 +82,29 @@
 <div id="sketch_container" style="position: relative;"></div>
 
 <script>
-    function showValue(target, val) {
-        $(target).text(val);
-    }
 
     function initialize() {
         $('#sketch_container')[0].innerHTML = "";
         if (window.analyzer) analyzer.remove();
         console.log("initializing")
         var sketch = function (p) {
-            var meta = {
-                file: $('#songUrl').val(),
-                bpm: $('#songBpm').val(),
-                delay: $('#songDelay').val(),
-                analysis: []
+            var source;
+
+            var meta = {}
+            if ($('#songFile')[0].files[0]) {
+                source = $('#songFile')[0].files[0];
+                meta.file = source.name;
+            } else {
+                source = $('#songUrl').val();
+                meta.file = source;
             }
+
+
+            meta.artist = $('#songArtist').val();
+            meta.title = $('#songTitle').val();
+            meta.bpm = $('#songBpm').val();
+            meta.delay = $('#songDelay').val();
+            meta.analysis = [];
             var bass_threshold = $('#bassThresh').val() / 100;
             var mid_threshold = $('#midThresh').val() / 100;
             var treble_threshold = $('#trebleThresh').val() / 100;
@@ -106,7 +127,7 @@
 
 
             p.preload = function () {
-                source_file = p.loadSound(meta.file); // preload the sound
+                source_file = p.loadSound(source); // preload the sound
             }
 
             p.setup = function () {
@@ -226,7 +247,7 @@
                 var data = encode(JSON.stringify(
                     meta
                     , null, 4));
-                var filename = meta.file.substring(meta.file.lastIndexOf('/')+1) + '.json';
+                var filename = meta.file.substring(meta.file.lastIndexOf('/') + 1) + '.json';
 
                 var blob = new Blob([data], {
                     type: 'application/octet-stream'
