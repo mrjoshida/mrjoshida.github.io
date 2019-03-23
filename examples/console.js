@@ -50,6 +50,7 @@ function draw() {
 function printText(text) {
   text_console.timeout = millis() + 3000;
   text_console.style('max-height', "100px");
+  text_console.style('height', 'auto');
   text_console.html("<p>" + text + "</p>", true);
   console_container.removeClass('console_closed');
   //console_container.show();
@@ -59,7 +60,8 @@ function printText(text) {
 function collapseConsole() {
   var time = millis();
   if (text_console.timeout <= millis() && text_console.elt.clientHeight > 25) {
-    text_console.style('max-height', Math.max(25, text_console.elt.clientHeight - 10) + "px");
+    text_console.style('height', Math.max(25, text_console.elt.clientHeight - 5) + "px");
+    text_console.style('max-height', "25px");
     stickToConsoleBottom();
   }
 }
