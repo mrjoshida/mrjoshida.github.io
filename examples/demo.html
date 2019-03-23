@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sketch Demo</title>
+    <script src="lib/jquery.min.js" type="text/javascript"></script>
+    <script src="lib/p5.js" type="text/javascript"></script>
+    <script src="lib/p5.dom.js" type="text/javascript"></script>
+    <script src="../lib/p5.sound.js" type="text/javascript"></script>
+    <script src="../lib/p5.play.js" type="text/javascript"></script>
+
+</head>
+<body>
+
+<script type="text/javascript">
+
+
+      //load a script
+      $(document).ready( function () {
+
+        var searchString = window.location.search.substring(1);
+        var variableArray = searchString.split('&');
+        fileName = getUrlValue("fileName");
+
+        if(fileName==undefined)
+          fileName = "sound-part.js";
+
+        $.ajax({
+          type: "GET",
+          url: fileName,
+          dataType: "text",
+          async: true,
+          success: loadLibraries,
+          error: loadLibrariesDefault
+        });
+
+      });//doc ready
+
+      function getUrlValue(varSearch) {
+        var searchString = window.location.search.substring(1);
+        var variableArray = searchString.split('&');
+
+        for(var i = 0; i < variableArray.length; i++){
+          var keyValuePair = variableArray[i].split('=');
+          console.log(keyValuePair);
+          if(keyValuePair[0] == varSearch){
+            return keyValuePair[1];
+          }
+        }
+      }
+</script>
+</body>
+</html>
+
+
