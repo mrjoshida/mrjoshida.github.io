@@ -83,3 +83,36 @@ position:fixed;*/
   width:30%;
   display:block;*/
 }
+
+#console{
+  height: auto;
+  max-height:100px;
+  width:400px;
+  /*top:0px;
+  left:0px;*/
+  position:absolute;
+  z-index:999;
+  /*display:none;*/
+  color:#fff;
+  text-align:left;
+  transition: opacity 1s linear;
+}
+#text_console{
+  background: rgba(255, 255, 255, 0.2);
+  max-height:100px;
+  padding:8px;
+  color:#000;
+  font-size: 12px;
+  font-family:courier;
+  overflow-y: scroll;
+  transition:max-height 1s ease-out;
+}
+
+#text_console p {
+  margin: 0;
+  line-height: 14px
+}
+
+.console_closed {
+  opacity: 0;
+}
