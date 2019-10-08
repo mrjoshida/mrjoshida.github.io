@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/code-dot-org/p5.play.svg?branch=master)](https://travis-ci.org/code-dot-org/p5.play)
 
-_This is the [Code.org](https://code.org/) fork of p5.play.  You can [check out the main project here](http://p5play.molleindustria.org)!_
+_This is based on a fork of the the [Code.org](https://code.org/) fork of p5.play.  You can [check out the main project here](http://p5play.molleindustria.org)!_
 
 p5.play is a p5.js library for the creation of games and playthings.
 
@@ -52,7 +52,6 @@ welcome page.
 
   [localhost:8080]: http://localhost:8080/
   [localhost:8080/test]: http://localhost:8080/test/
-  [localhost:8080/docs]: http://localhost:8080/docs/
   [localhost:8080/examples]: http://localhost:8080/examples/
   [p5.js]: https://p5js.org
   [p5js.org/tutorials]: http://p5js.org/tutorials/
